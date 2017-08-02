@@ -5,27 +5,39 @@ table.js is a library for DOM element generator.
 /* tr node */
 var tr = function tr(){
 	this.tr = new Object();
+	this.env = new Object();
 	return this;
 }
 
 tr.prototype.th = function(th) {
+	var head = new RAM().get('head');
 	for (var i = th.length - 1; i >= 0; i--) {
-		th[i] = "<th>"+ th[i]+"</th>";
+		th[i] = "<th class='"+head.th+"'>"+ th[i]+"</th>";
 	}
 	this.tr.e=th;
+	this.env.isHead = true;
 	return this;
 };
 
 tr.prototype.td = function(td) {
+	var body = new RAM().get('body');
 	for (var i = td.length - 1; i >= 0; i--) {
-		td[i] = "<td>"+ td[i]+"</td>";
+		td[i] = "<td class='"+body.td+"'>"+ td[i]+"</td>";
 	}
 	this.tr.e = td;
+	this.env.isHead = false;
 	return this;
 };
 
 tr.prototype.make = function() {
-	var node = "<tr>";
+	var node = "";
+	if (this.env.isHead) {
+		var head = new RAM().get('head'); 
+		node = "<tr class='"+head.tr+"'>";
+	}else{
+		var body = new RAM().get('body');
+		node = "<tr class='"+body.tr+"'>";
+	}
 	for (var i = this.tr.e.length - 1; i >= 0; i--) {
 		node += this.tr.e[i];
 	}
@@ -42,12 +54,26 @@ var table = function table(tableID){
 	return this;
 }
 
+table.prototype.css = function(){
+	return this;
+};
+
+table.prototype.head = function(styleCalss){
+	new RAM().set('head',styleCalss);
+	return this;
+};
+
+table.prototype.body = function(styleCalss) {
+	new RAM().set('body',styleCalss);
+	return this;
+};
+
+
 table.prototype.tr = new tr();
 
 table.prototype.install = function() {
 	var html = "";
 	for (var i = this.trs.length - 1; i >= 0; i--) {
-		console.log(this.trs[i]);
 		html += this.trs[i];
 	}
 	document.getElementById(this.tableID).innerHTML = html;
